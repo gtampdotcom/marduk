@@ -1,3 +1,6 @@
+This Sony PSP port of Marduk is just in very early stages. It's slow, there's no virtual keyboard and only a few of the buttons work.
+The IP address for the adapter is currently hard coded as 192.168.1.194, so you'll have to compile it to change it.
+
 What is Marduk?
 ===============
 
@@ -41,15 +44,15 @@ Status
   CPU - Tested, working.
   VDP - Tested, working.
   PSG - Tested, working.
-  Console lights - Tested, working.
-  Keyboard - Tested, working.
-  Joystick - Implemented through keyboard; see below.
+  Console lights - Tested, working. (not on the PSP port)
+  Keyboard - Tested, working. (not on the PSP port)
+  Joystick - Implemented through keyboard; see below. (not on the PSP port)
   Cable modem - Working, more or less.
-  Strict speed control - Tested (mostly with another emulator), working.
+  Strict speed control - Tested (mostly with another emulator), working. (PSP port is strictly slow)
 
 Key bindings
 ============
-
+  Note: PSP has no keyboard.
   Note: The keyboard interface code does not appear to be correct.
 
   F3 = Reset
