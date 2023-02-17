@@ -32,6 +32,31 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#ifdef PSP
+#include <pspkernel.h>
+#include <pspdebug.h>
+#include <pspctrl.h>
+#include <pspdisplay.h>
+#include <psputility.h>
+#include <pspnet.h>
+#include <pspnet_inet.h>
+#include <pspnet_apctl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <string.h>
+#include "psp.h"
+
+#define timeval SceNetInetTimeval
+
+#define select  sceNetInetSelect
+#define recv    sceNetInetRecv
+#define send    sceNetInetSend
+#define socket  sceNetInetSocket
+#define connect sceNetInetConnect
+#define close   sceNetInetClose
+#endif
+
 /*
  * Version of modem.c to interface with DJ Sures' emulator.
  * 
@@ -92,6 +117,56 @@ int modem_init (void)
  
  status=0;
  
+#ifdef PSP
+sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
+sceUtilityLoadNetModule(PSP_NET_MODULE_INET);
+
+sceNetInit(64*1024, 32, 2*1024, 32, 2*1024);
+sceNetInetInit();
+sceNetApctlInit(0x2000, 20);
+
+int net = select_netconfig();
+connect_ap(net);
+
+/*
+FILE *ptr_file;
+char buf[16];
+ptr_file = fopen("marduk.ini","r");
+int fileLen = fread(buf,1,16,ptr_file);
+char adapterIP[fileLen];
+memcpy(adapterIP, buf,16);
+fclose(ptr_file);
+
+//printf("Found %s adapter IP in marduk.ini\n",adapterIP);
+printf("Adapter IP: %s\n", adapterIP);
+*/
+
+char adapterIP[16] = "192.168.1.194";
+printf("Adapter IP: %s\n", adapterIP);
+
+printf("Connecting to %s on port %i\n",adapterIP, 5816);
+char psp_ip[16];
+if (get_ip(psp_ip))
+printf("PSP's IP: %s\n", psp_ip);
+else
+{
+printf("Could not get PSP IP address\n");
+e=-1;
+return 0;
+}
+
+mosock = sceNetInetSocket(AF_INET, SOCK_STREAM, 0);
+
+struct sockaddr_in sa_dst;
+memset(&sa_dst, 0, sizeof(struct sockaddr_in));
+sa_dst.sin_family = AF_INET;
+sa_dst.sin_port = htons(5816);
+inet_pton(AF_INET, adapterIP, &sa_dst.sin_addr.s_addr);
+
+e = sceNetInetConnect(mosock, (struct sockaddr *) &sa_dst, sizeof(struct sockaddr_in));
+
+#else
+ 
  struct addrinfo hints, *result;
 
  memset(&hints,0,sizeof(struct addrinfo));
@@ -100,22 +175,39 @@ int modem_init (void)
  hints.ai_flags=(AI_NUMERICHOST | AI_NUMERICSERV);
  hints.ai_protocol=IPPROTO_TCP;
  e=getaddrinfo("127.0.0.1", "5816", &hints, &result);
+ 
+#endif
+
  if (e)
  {
+  #ifdef PSP
+  fprintf (stderr, "Modem init failed: %d\n", sceNetInetGetErrno());
+  #else
   fprintf (stderr, "Modem init failed: %s\n", gai_strerror(e));
+  #endif
   return -1;
  }
  
+ #ifndef PSP
  mosock=socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+ #endif
+ 
  if (mosock<0)
  {
   perror ("Could not get a socket");
+  #ifdef PSP
+  close(mosock);
+  #else
   freeaddrinfo(result);
+  #endif
   return -1;
  }
  
+ #ifndef PSP
  e=connect(mosock, result->ai_addr, result->ai_addrlen);
  freeaddrinfo(result);
+ #endif
+ 
  if (e==-1)
  {
   perror ("Connection to virtual modem failed");

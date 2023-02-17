@@ -53,6 +53,15 @@
 
 #define VERSION "0.22"
 
+#ifdef PSP
+  #include <pspdisplay.h>
+  #define WIDTH 480
+  #define HEIGHT 272
+#else
+  #define WIDTH 640
+  #define HEIGHT 480
+#endif
+
 /*
  * Forward declaration.
  */
@@ -476,6 +485,77 @@ void keyboard_poll()
   {
     switch (event.type)
     {
+	#ifdef PSP
+	case SDL_CONTROLLERDEVICEADDED:
+		SDL_GameControllerOpen(event.cdevice.which);
+	case SDL_CONTROLLERBUTTONDOWN:
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_START)
+		{	
+		printf("Reset pressed\n");
+		  clock_gettime(CLOCK_REALTIME, &timespec);
+          next_fire = timespec.tv_nsec + FIRE_TICK;
+          reinit_cpu();
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{	
+		 printf("space pressed\n");
+		 keyboard_buffer_put(' ');
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{	
+		 printf("return pressed\n");
+		 keyboard_buffer_put(SDLK_RETURN);
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
+		{
+         //keyboard_buffer_put(170); /* YES */
+		 keyboard_buffer_put(232); /* YES */ //testing
+		 //int r = (rand() % 100)+155;
+		 //printf("button x pressed (random %d)\n",r);
+		 //keyboard_buffer_put(r);
+		 printf("x pressed\n");
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
+		{
+	 	 keyboard_buffer_put(160);  /* NO */
+		 printf("y pressed\n");
+		 //int r = (rand()) % 100+155;
+		 //printf("button y pressed (random %d)\n",r);
+		 //keyboard_buffer_put(r);
+		 
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+		{	
+		 printf("dpad up pressed\n");
+		 keyboard_buffer_put(230);  // this works as instant drop
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+		{	
+		 printf("dpad down pressed\n");
+		 //joybyte &= 0xFD;
+         //keyboard_buffer_put(0x80);
+         //keyboard_buffer_put(joybyte|0xA0);
+		 //keyboard_buffer_put(0xF3);
+		 keyboard_buffer_put(178); // works fine
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_LEFT)
+		{	
+		 printf("dpad left pressed\n");
+		 
+		 keyboard_buffer_put(161); // 189
+		 // 232 or 180 to rotate piece right  170 190 YES
+		 // 230 or 160 to drop straight down NO 
+		 
+		}
+		if(event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
+		{	
+		 printf("dpad right pressed\n");
+		 //joybyte &= 0xFB;
+         //keyboard_buffer_put(0x80);
+         //keyboard_buffer_put(joybyte|0xA0);
+		 keyboard_buffer_put(224); //224 // 172 this rotates to right, not working
+		}
+	#else
     /*
      * "Break key" codes for arrows.
      */
@@ -740,6 +820,7 @@ void keyboard_poll()
     case SDL_QUIT:
       death_flag = 1;
       break;
+	#endif
     }
   }
 }
@@ -749,6 +830,9 @@ void keyboard_poll()
  */
 void every_scanline(void)
 {
+  #ifdef PSP
+  //shrug
+  #else
   struct timespec n;
 
   keyboard_poll();
@@ -760,6 +844,7 @@ void every_scanline(void)
   {
     nanosleep(&n, 0);
   }
+  #endif
 }
 
 /*
@@ -777,6 +862,26 @@ void render_scanline(int line)
   if (line > 239)
     return;
 
+  #ifdef PSP
+ 
+  bg = 0xFF000000 | (vrEmuTms9918Palette[vrEmuTms9918RegValue(vdp, 7) & 0x0F] >> 8);
+  for (x = 0; x < 320; x++)
+    g_scanline[x] = bg;
+  //if ((line >= 24) && (line < 216))
+  {
+    vrEmuTms9918ScanLine(vdp, line - 0, a_scanline);
+    for (x = 0; x < 256; x++)
+      g_scanline[x + 0] = vrEmuTms9918Palette[a_scanline[x]] >> 8;
+  }
+
+  /* not Double-scan anymore. */
+  r = line * 256;
+  for (x = 0; x < 320; x++)
+  {
+    display[r+x] = g_scanline[x];
+  }
+  #else
+	  
   /*
    * To note:
    *
@@ -902,6 +1007,7 @@ void render_scanline(int line)
       display[r + 640 + 631] = ri[2];
     }
   }
+  #endif 
 }
 
 /*
@@ -911,10 +1017,18 @@ void render_scanline(int line)
  */
 void next_frame(void)
 {
+  #ifdef PSP
+  SDL_UpdateTexture(texture, 0, display, 256 * sizeof(uint32_t));
+  #else
   SDL_UpdateTexture(texture, 0, display, 640 * sizeof(uint32_t));
+  #endif
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, 0, 0);
   SDL_RenderPresent(renderer);
+  
+  #ifdef PSP
+  keyboard_poll();
+  #endif
 }
 
 /*
@@ -1066,7 +1180,7 @@ int main(int argc, char **argv)
   }
 
   screen = SDL_CreateWindow("Marduk", SDL_WINDOWPOS_UNDEFINED,
-                            SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+                            SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0);
   if (!screen)
   {
     fprintf(stderr, "FATAL: Could not create display\n");
@@ -1079,13 +1193,21 @@ int main(int argc, char **argv)
     return 2;
   }
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+							  #ifdef PSP
+							  SDL_TEXTUREACCESS_STREAMING, 256, 192);
+							  #else
                               SDL_TEXTUREACCESS_STREAMING, 640, 480);
+							  #endif
   if (!texture)
   {
     fprintf(stderr, "FATAL: Could not create canvas\n");
     return 2;
   }
+  #ifdef PSP
+  display = calloc(69420, sizeof(uint32_t));
+  #else
   display = calloc(307200, sizeof(uint32_t));
+  #endif
   if (!display)
   {
     fprintf(stderr, "FATAL: Not enough memory for offscreen buffer\n");
@@ -1170,7 +1292,6 @@ int main(int argc, char **argv)
   next_fire = timespec.tv_nsec + FIRE_TICK;
   next_watchdog = 0;
   keyjoy = joybyte = 0;
-  int i;
 
   int16_t sound_sample = 0;
 
@@ -1192,7 +1313,7 @@ int main(int argc, char **argv)
         update_interrupts();
         // printf("KEYBOARD: int! %d %d\r\n", keyboard_buffer_read_ptr, keyboard_buffer_write_ptr);
       }
-
+	
       every_scanline();
 
       /* ready to kick the dog? */
