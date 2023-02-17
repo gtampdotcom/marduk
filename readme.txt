@@ -1,6 +1,8 @@
 This Sony PSP port of Marduk is just in very early stages. It's slow, there's no virtual keyboard and only a few of the buttons work.
 The IP address for the adapter is currently hard coded as 192.168.1.194, so you'll have to compile it to change it.
 
+https://www.youtube.com/shorts/yG0QM4WfflU
+
 What is Marduk?
 ===============
 
