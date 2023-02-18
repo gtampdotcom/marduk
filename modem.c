@@ -128,25 +128,32 @@ sceNetApctlInit(0x2000, 20);
 int net = select_netconfig();
 connect_ap(net);
 
-/*
-FILE *ptr_file;
-char buf[16];
-ptr_file = fopen("marduk.ini","r");
-int fileLen = fread(buf,1,16,ptr_file);
-char adapterIP[fileLen];
-memcpy(adapterIP, buf,16);
-fclose(ptr_file);
+FILE *fp = NULL;
+char adapterIP[16];
 
-//printf("Found %s adapter IP in marduk.ini\n",adapterIP);
+fp = fopen("marduk.ini", "r");
+
+if (fp == NULL) 
+{
+ printf("error reading marduk.ini\n");
+ fclose(fp);
+ return 1;
+}
+
+if (fgets(adapterIP, sizeof(adapterIP), fp) == NULL)
+{
+ printf("File read error.\n");
+ fclose(fp);
+ return 1;
+}
+
+fclose(fp);
+
 printf("Adapter IP: %s\n", adapterIP);
-*/
 
-char adapterIP[16] = "192.168.1.194";
-printf("Adapter IP: %s\n", adapterIP);
-
-printf("Connecting to %s on port %i\n",adapterIP, 5816);
 char psp_ip[16];
 if (get_ip(psp_ip))
+	
 printf("PSP's IP: %s\n", psp_ip);
 else
 {
@@ -155,6 +162,7 @@ e=-1;
 return 0;
 }
 
+printf("Connecting...\n");
 mosock = sceNetInetSocket(AF_INET, SOCK_STREAM, 0);
 
 struct sockaddr_in sa_dst;
