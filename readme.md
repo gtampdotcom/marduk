@@ -58,17 +58,7 @@ Status
 
 Key bindings
 ============
-  Note: PSP has no keyboard.
-  Note: The keyboard interface code does not appear to be correct.
-
-  F3 = Reset
-  F5 = Arrows and space route to the keyboard.
-  F6 = Arrows and space route to the P1 joystick.
-  F10 = Exit
-  Ins and Del = Yes and No
-  PgUp and PgDn = << and >>
-
-  Everything else should be obvious.
+  PSP X and O buttons are mapped to space and enter
 
 License
 =======
