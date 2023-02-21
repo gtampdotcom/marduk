@@ -10,11 +10,16 @@
 #include <string.h>
 #include <stdio.h>
 
+void cleanup();
+void net_apctl_event_handler(int oldState, int newState, int event, int error, void *pArg);
+
 int run = 1;
 
 int select_netconfig()
 {
-    #define MAX_CONFIG 10
+	//SetupExitCallback(); this causes crashes
+	
+	#define MAX_CONFIG 10
     struct {
         int config_n;
         char name[20];
@@ -106,10 +111,15 @@ int get_ip(char *ip)
 
 int ExitCallback(int arg1, int arg2, void *common)
 { 
-    run = 0;
+    printf("bye!\n");
+	//modem_deinit();
+    //cleanup();
+	run = 0;
     return 0; 
+	//sceKernelExitGame();
 } 
 
+/*
 int CallbackThread(SceSize args, void *argp)
 { 
     int cbid; 
@@ -128,3 +138,18 @@ int SetupExitCallback()
     } 
     return thid; 
 }
+
+void net_apctl_event_handler(int oldState, int newState, int event, int error, void *pArg)
+{
+    if (newState == PSP_NET_APCTL_STATE_DISCONNECTED) {
+        printf("Disconnected!\n");  
+    }
+}
+
+void cleanup()
+{
+    sceNetApctlTerm();
+    sceNetInetTerm();
+    sceNetTerm();
+}
+*/

@@ -18,26 +18,31 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-TARGET = marduk
+CFLAGS := -I../watt32/inc
+LIBS := -L../watt32/lib -lwatt
 
-OBJS	= dasm80.o emu2149.o main.o modem.o tms9918.o tms_util.o z80.o psp.o
+all:	dmarduk.exe
 
-CFLAGS = -O2 -G0 -Wall -DPSP
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS = $(CFLAGS) 
-BUILD_PRX = 1
+dmarduk.exe:	emu2149.o main.o modem.o tms9918.o tms_util.o z80.o
+	$(CC) $(CFLAGS) -o dmarduk.exe emu2149.o main.o modem.o tms9918.o tms_util.o z80.o $(LIBS)
 
-LIBDIR =
-LDFLAGS =
+emu2149.o:	emu2149.c emu2149.h
+	$(CC) $(CFLAGS) -c -o emu2149.o emu2149.c
 
-EXTRA_TARGETS = EBOOT.PBP
-PSP_EBOOT_TITLE = marduk
-PSP_EBOOT_ICON=icon.png
+main.o:	main.c emu2149.h modem.h tms9918.h tms_util.h z80.h
+	$(CC) $(CFLAGS) -c -o main.o main.c
 
-PSPSDK=$(shell psp-config --pspsdk-path)
-PSPBIN = $(PSPSDK)/../bin
-CFLAGS += $(shell $(PSPBIN)/sdl2-config --cflags)
-LIBS += -lz -lm $(shell $(PSPBIN)/sdl2-config --libs)
+modem.o:	modem.c modem.h
+	$(CC) $(CFLAGS) -c -o modem.o modem.c
 
+tms9918.o:	tms9918.c tms9918.h
+	$(CC) $(CFLAGS) -c -o tms9918.o tms9918.c
 
-include $(PSPSDK)/lib/build.mak
+tms_util.o:	tms_util.c tms9918.h tms_util.h
+	$(CC) $(CFLAGS) -c -o tms_util.o tms_util.c
+
+z80.o:	z80.c z80.h
+	$(CC) $(CFLAGS) -c -o z80.o z80.c
+
+clean:
+	rm -f dmarduk.exe emu2149.o main.o modem.o tms9918.o tms_util.o z80.o

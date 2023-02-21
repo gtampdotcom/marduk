@@ -111,7 +111,7 @@ void modem_write (uint8_t data)
  return;
 }
 
-int modem_init (void)
+int modem_init (char *server, char *port)
 {
  int e;
  
@@ -232,4 +232,6 @@ void modem_deinit (void)
  if (!status) return;
  printf ("Shutting down virtual modem.\n");
  close(mosock);
+ //sceUtilityUnloadNetModule(PSP_NET_MODULE_COMMON);
+ //sceUtilityUnloadNetModule(PSP_NET_MODULE_INET);
 }
