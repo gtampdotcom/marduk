@@ -3,18 +3,7 @@
 ![nabu psp 04](https://user-images.githubusercontent.com/910729/220287412-2188747e-8efa-4e5f-bd57-7a0293bbbc5f.jpg)
 ![nabu psp 05](https://user-images.githubusercontent.com/910729/220287418-41b82c78-f0ae-44e6-9a11-d305775135a8.jpg)
 
-This Sony PSP port of Marduk is just in very early stages. It runs much slow than a real NABU and there's no virtual keyboard.
-
-Controls:
-
-START = reset
-SELECT = ESC
-SQUARE = YES
-TRIANGLE = NO
-CIRCLE = space
-CROSS = GO (joystick button)
-
-dpad and thumbstick both send joystick movement
+This Sony PSP port of Marduk is just in very early stages. It runs much slow than a real NABU PC and there's no virtual keyboard.
 
 The IP address for the adapter is read from marduk.ini
 
@@ -59,17 +48,37 @@ Status
   I/O code.
 
   CPU - Tested, working.
+  
   VDP - Tested, working.
+  
   PSG - Tested, working.
+  
   Console lights - Tested, working. (not on the PSP port)
+  
   Keyboard - Tested, working. (not on the PSP port)
-  Joystick - Implemented through keyboard; see below. (not on the PSP port)
+  
+  Joystick - Implemented but a little buggy on PSP
+  
   Cable modem - Working, more or less.
+  
   Strict speed control - Tested (mostly with another emulator), working. (PSP port is strictly slow)
 
 Key bindings
 ============
-  PSP X and O buttons are mapped to space and enter
+
+  START = reset
+
+  SELECT = ESC
+
+  SQUARE = YES
+
+  TRIANGLE = NO
+
+  CIRCLE = space
+
+  CROSS = GO (joystick button)
+
+  dpad and thumbstick both send joystick movement
 
 License
 =======
