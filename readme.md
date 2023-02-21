@@ -1,4 +1,7 @@
-![nabu-psp](https://user-images.githubusercontent.com/910729/219720136-c19163e0-b219-438e-bc54-354d59c1070a.jpg)
+![nabu psp 01](https://user-images.githubusercontent.com/910729/220287400-11513474-4032-421d-b3c8-b5bef1dfd7e4.jpg)
+![nabu psp 02](https://user-images.githubusercontent.com/910729/220287409-68b1b30b-e032-42bf-8a9c-21dc35f346ec.jpg)
+![nabu psp 04](https://user-images.githubusercontent.com/910729/220287412-2188747e-8efa-4e5f-bd57-7a0293bbbc5f.jpg)
+![nabu psp 05](https://user-images.githubusercontent.com/910729/220287418-41b82c78-f0ae-44e6-9a11-d305775135a8.jpg)
 
 This Sony PSP port of Marduk is just in very early stages. It's slow, there's no virtual keyboard and only a few of the buttons are mapped to keys.
 X and O mapped to space and enter.
