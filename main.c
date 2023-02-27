@@ -1099,6 +1099,7 @@ void render_scanline(int line)
     return;
 
 #ifdef PSP
+  --line; //we don't want to skip line 0
   bg = 0xFF000000 | (vrEmuTms9918Palette[vrEmuTms9918RegValue(vdp, 7) & 0x0F] >> 8);
   for (x = 0; x < 256; x++)
    g_scanline[x] = bg;
