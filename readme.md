@@ -3,7 +3,7 @@
 ![nabu psp 04](https://user-images.githubusercontent.com/910729/220287412-2188747e-8efa-4e5f-bd57-7a0293bbbc5f.jpg)
 ![nabu psp 05](https://user-images.githubusercontent.com/910729/220287418-41b82c78-f0ae-44e6-9a11-d305775135a8.jpg)
 
-This Sony PSP port of Marduk is just in very early stages. It runs much slow than a real NABU PC and there's no virtual keyboard.
+This Sony PSP port of Marduk is just in very early stages. It runs slower than a real NABU PC and there's no virtual keyboard.
 
 The IP address for the adapter is read from marduk.ini
 
