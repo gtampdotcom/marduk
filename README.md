@@ -1,1 +1,1 @@
-Projects for the retro NABU PC
+Emulator for the NABU PC
